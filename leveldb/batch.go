@@ -9,7 +9,7 @@ package leveldb
 import (
 	"encoding/binary"
 	"fmt"
-	"io"
+	
 
 	"github.com/syndtr/goleveldb/leveldb/errors"
 	"github.com/syndtr/goleveldb/leveldb/memdb"
