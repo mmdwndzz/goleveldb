@@ -416,15 +416,12 @@ func (w *Writer) writeBlock() {
 	w.written = 0
 	w.blockNumber++
 	ctx := context.Background()
-	err := rdb.Set(ctx, "testkey", "testvalue", 0).Err()
+	
+	val, err := rdb.Get(ctx, "testkey1").Result()
 	if err != nil {
 		panic(err)
 	}
-	val, err := rdb.Get(ctx, "testkey").Result()
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println("testkey:", val)
+	fmt.Println("testkey1:", val)
 }
 
 // writePending finishes the current journal and writes the buffer to the
