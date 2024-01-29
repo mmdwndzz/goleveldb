@@ -81,12 +81,21 @@ import (
 	"encoding/binary"
 	"fmt"
 	"io"
+	"github.com/redis/go-redis/v9"
 
 	"github.com/syndtr/goleveldb/leveldb/errors"
 	"github.com/syndtr/goleveldb/leveldb/storage"
 	"github.com/syndtr/goleveldb/leveldb/util"
 )
+var rdb *redis.Client
 
+func init() {
+	rdb = redis.NewClient(&redis.Options{
+		Addr:     "localhost:7001",
+		Password: "", // 没有密码，默认值
+		DB:       0,  // 默认DB 0
+	})
+}
 // These constants are part of the wire format and should not be changed.
 const (
 	fullChunkType   = 1
@@ -405,6 +414,16 @@ func (w *Writer) writeBlock() {
 	w.j = headerSize
 	w.written = 0
 	w.blockNumber++
+	ctx := context.Background()
+	err := rdb.Set(ctx, "testkey", "testvalue", 0).Err()
+	if err != nil {
+		panic(err)
+	}
+	val, err := rdb.Get(ctx, "testkey").Result()
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("testkey:", val)
 }
 
 // writePending finishes the current journal and writes the buffer to the
