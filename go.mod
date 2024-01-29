@@ -11,3 +11,4 @@ require (
 	golang.org/x/net v0.0.0-20220607020251-c690dde0001d // indirect
 	golang.org/x/xerrors v0.0.0-20220517211312-f3a8303e98df // indirect
 )
+replace github.com/syndtr/goleveldb v1.0.0 => github.com/mmdwndzz/goleveldb v1.0.0
