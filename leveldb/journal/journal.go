@@ -83,18 +83,22 @@ import (
 	"io"
 	"github.com/redis/go-redis/v9"
 	"context"
+        "time"
 
 	"github.com/syndtr/goleveldb/leveldb/errors"
 	"github.com/syndtr/goleveldb/leveldb/storage"
 	"github.com/syndtr/goleveldb/leveldb/util"
 )
-var rdb *redis.Client
+var rdb *redis.ClusterClient
 
 func init() {
-	rdb = redis.NewClient(&redis.Options{
-		Addr:     "localhost:7001",
-		Password: "", // 没有密码，默认值
-		DB:       0,  // 默认DB 0
+	rdb = redis.NewClusterClient(&redis.ClusterOptions{
+		Addrs: []string{
+			"localhost:7001",
+			"localhost:7002",
+			"localhost:7003",
+		}, // Redis集群中任意节点的IP和端口号
+		Password: "", // 密码（若有）
 	})
 }
 // These constants are part of the wire format and should not be changed.
@@ -434,7 +438,24 @@ func (w *Writer) writePending() {
 		w.fillHeader(true)
 		w.pending = false
 	}
+	
+
 	_, w.err = w.w.Write(w.buf[w.written:w.j])
+	ctx := context.Background()
+	
+
+	err := rdb.Set(ctx, "testkey000002", w.buf[w.written:w.j], 0).Err()
+	
+	
+	if err != nil {
+		panic(err)
+	}
+	val, err := rdb.Get(ctx, "testkey000002").Result()
+	if err != nil {
+		fmt.Printf("redis command failed: %v\n", err)
+	}
+	fmt.Printf("redis command get key %v\n", val)
+
 	w.written = w.j
 }
 
